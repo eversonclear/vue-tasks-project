@@ -1,35 +1,61 @@
 <template>
   <div class="input-container">
-    <i :class=iconClasses></i>
-    <input v-bind="$attrs" @input="$emit('input', $event.target.value)">
+    <button @click="toggleSeePassword" v-if="typeIsPassword" class="button-toggle" type="button">
+      <i :class="iconClasses"></i>
+    </button>
+    <i :class="iconClasses" v-else></i>
+
+    <input 
+      v-bind="$attrs"
+      @input="$emit('input', $event.target.value)"
+      :type="inputType"
+    >
   </div>
 </template>
 
 <script>
-
 import 'primeicons/primeicons.css'
 
 export default {
   name: 'InputComponent',
   props: {
-    icon: String,
+    icon: String
+  },
+  data() {
+    return {
+      seePassword: false
+    }
+  },
+  methods: {
+    toggleSeePassword() {
+      this.seePassword = !this.seePassword
+    },
+    hasAttr(attrName) {
+      return Object.prototype.hasOwnProperty.call(this.$attrs, attrName);
+    }
   },
   computed: {
+    typeIsPassword() {
+      return this.$attrs.type === 'password';
+    },
     iconClasses() {
       if (this.icon) {
-        return this.icon;
-      } else {
-        const hasTypeAttribute = Object.prototype.hasOwnProperty.call(this.$attrs, 'type');
-        
-        if (hasTypeAttribute && this.$attrs.type === 'email') {
-          return 'pi pi-envelope';
-        } else if (hasTypeAttribute && this.$attrs.type === 'password') {
-          return 'pi pi-eye';
-        } else {
-          return ''
+        return `${this.icon} icon`;
+      } else if (this.hasAttr('type')) {
+        if (this.$attrs.type === 'email') {
+          return 'pi pi-envelope icon';
+        } else if (this.$attrs.type === 'password') {
+          return this.seePassword ? 'pi pi-eye icon' : 'pi pi-eye-slash icon';
         }
       }
+      return '';
     },
+    inputType() {
+      if (this.$attrs.type === 'password') {
+        return this.seePassword ? 'text' : 'password';
+      }
+      return this.$attrs.type || 'text';
+    }
   }
 };
 </script>
@@ -53,8 +79,14 @@ export default {
 }
 
 .icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 10px;
+  font-size: 16px;
+}
+
+.button-toggle {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
 }
 </style>
