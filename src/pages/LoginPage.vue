@@ -31,8 +31,17 @@ export default {
     }
   },
   methods: {
-    handleLogin() {
-      console.log('Email:', this.email, 'Password:', this.password)
+    async handleLogin() {
+      try {
+        const response = await this.$apiClient.post('/login', {
+          email: this.email,
+          password: this.password
+        })
+
+        console.log(response.data)
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 }

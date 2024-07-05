@@ -4,19 +4,19 @@
       <form @submit.prevent="handleSignup">
         <div class="input-group">
           <label for="first_name">First Name</label>
-          <InputComponent v-model="first_name" type="text" id="first_name" placeholder="Enter your first name" icon="pi pi-user" />
+          <InputComponent required v-model="first_name" type="text" id="first_name" placeholder="Enter your first name" icon="pi pi-user" />
         </div>
         <div class="input-group">
           <label for="last_name">Last Name</label>
-          <InputComponent v-model="last_name" type="text" id="last_name" placeholder="Enter your last name" icon="pi pi-user"/>
+          <InputComponent required v-model="last_name" type="text" id="last_name" placeholder="Enter your last name" icon="pi pi-user"/>
         </div>
         <div class="input-group">
           <label for="email">Email</label>
-          <InputComponent v-model="email" type="email" id="email" placeholder="Enter your email" />
+          <InputComponent required v-model="email" type="email" id="email" placeholder="Enter your email" />
         </div>
         <div class="input-group">
           <label for="password">Password</label>
-          <InputComponent v-model="password" type="password" id="password" placeholder="Enter your password" />
+          <InputComponent required v-model="password" type="password" id="password" placeholder="Enter your password" />
         </div>
         <button type="submit" class="signup-button">Register</button>
       </form>
@@ -34,13 +34,24 @@ export default {
   },
   data() {
     return {
+      first_name: '',
+      last_name: '',
       email: '',
       password: ''
     }
   },
   methods: {
-    handleSignup() {
-      console.log('Email:', this.email, 'Password:', this.password)
+    async handleSignup() {
+      try {
+        const response = await this.$apiClient.post('/signup', {
+          email: this.email,
+          password: this.password
+        })
+
+        console.log(response.data)
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 }
