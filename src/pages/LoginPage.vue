@@ -44,7 +44,6 @@ export default {
 
 <style scoped>
 .login-container {
-  font-family: "Poppins", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;

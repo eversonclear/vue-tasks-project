@@ -1,56 +1,66 @@
-import { setBearerToken } from "@/config/apiClient"
+import { setBearerToken } from "@/config/apiClient";
+import { loginRequest, meRequest, signUpRequest } from "@/requests/user";
 
-import { loginRequest, meRequest } from "@/requests/user"
-import { SET_USER } from './mutation-types'
+import { SET_USER } from './mutation-types';
+
+const TOKEN_KEY = 'token';
+
+const getToken = () => localStorage.getItem(TOKEN_KEY);
+const setToken = (token) => localStorage.setItem(TOKEN_KEY, token);
+const removeToken = () => localStorage.removeItem(TOKEN_KEY);
 
 const makeLoginAction = async ({ dispatch }, loginData) => {
-  return new Promise((resolve, reject) => {
-    loginRequest(loginData.email, loginData.password).then(user => {
-      dispatch('setUserAction', user)
-      resolve(user)
-    }).catch(error => {
-      reject(error)
-    })
-  })
+  try {
+    const user = await loginRequest(loginData.email, loginData.password);
+    dispatch('setUserAction', user);
+    return user;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Login failed');
+  }
+};
+
+const makeSignupAction = async ({ dispatch }, signUpData) => {
+  try {
+    const user = await signUpRequest(signUpData.email, signUpData.password);
+    dispatch('setUserAction', user);
+    return user;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Sign up failed');
+  }
 }
 
-const loadActiveUser = ({ dispatch }) => {
-  return new Promise((resolve, reject) => {
-    const token = localStorage.getItem('token')
-    
-    if (!token) {
-      reject('Token not found')
-    }
-    
-    setBearerToken(token)
+const loadActiveUser = async ({ dispatch }) => {
+  const token = getToken();
+  if (!token) throw new Error('Token not found');
 
-    meRequest()
-      .then(user => {
-        dispatch('setUserAction', { ...user, token })
-        resolve(user)
-      })
-      .catch((error) => {
-        dispatch('logoutAction')
-        reject(error)
-      })
-  })
-}
+  setBearerToken(token);
+
+  try {
+    const user = await meRequest();
+    dispatch('setUserAction', { ...user, token });
+    return user;
+  } catch (error) {
+    dispatch('logoutAction');
+    throw new Error('Failed to load active user');
+  }
+};
 
 const setUserAction = ({ commit }, user) => {
-  localStorage.setItem('token', user.token)
-  setBearerToken(user.token)
-  commit(SET_USER, user)
-}
+  setToken(user.token);
+  setBearerToken(user.token);
+  commit(SET_USER, user);
+};
 
 const logoutAction = ({ commit }) => {
-  localStorage.removeItem('token')
-  setBearerToken(null)
-  commit(SET_USER, {})
-}
+  removeToken();
+  setBearerToken(null);
+  commit(SET_USER, {});
+};
 
 export default {
   makeLoginAction,
+  makeSignupAction,
   loadActiveUser,
   setUserAction,
   logoutAction
-}
+};

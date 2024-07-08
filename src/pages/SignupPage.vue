@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 import Input from '@/components/Input.vue'
 
 export default {
@@ -41,14 +43,17 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['makeSignupAction']),
     async handleSignup() {
       try {
-        const response = await this.$apiClient.post('/signup', {
+        await this.makeSignupAction({
+          first_name: this.first_name,
+          last_name: this.last_name,
           email: this.email,
           password: this.password
         })
 
-        console.log(response.data)
+        this.$router.push('/home')
       } catch (error) {
         console.error(error)
       }
@@ -59,7 +64,6 @@ export default {
 
 <style scoped>
 .signup-container {
-  font-family: "Poppins", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
