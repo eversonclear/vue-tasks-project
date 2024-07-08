@@ -19,6 +19,7 @@
 
 <script>
 import Input from '@/components/Input.vue'
+import { mapActions } from 'vuex'
 
 export default {
   components: {
@@ -31,17 +32,11 @@ export default {
     }
   },
   methods: {
-    async handleLogin() {
-      try {
-        const response = await this.$apiClient.post('/login', {
-          email: this.email,
-          password: this.password
-        })
-
-        console.log(response.data)
-      } catch (error) {
-        console.error(error)
-      }
+    ...mapActions(['makeLoginAction']),
+    handleLogin() {
+      this.makeLoginAction({ email: this.email, password: this.password }).then(() => {
+        this.$router.push('/home')
+      })
     }
   }
 }

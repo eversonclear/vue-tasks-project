@@ -5,4 +5,9 @@ const apiClient = axios.create({
   timeout: 1000,
 });
 
+const setBearerToken = (token) => {
+  apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+}
+
 export default apiClient;
+export { setBearerToken };
