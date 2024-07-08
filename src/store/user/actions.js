@@ -30,7 +30,6 @@ const loadActiveUser = ({ dispatch }) => {
         resolve(user)
       })
       .catch((error) => {
-        console.log('caiu aqui')
         dispatch('logoutAction')
         reject(error)
       })
